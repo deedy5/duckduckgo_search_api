@@ -24,3 +24,8 @@ docker image build -t duckduckgo_search .
 ```python3
 docker run -d --name ddg -p 8000:8000 duckduckgo_search
 ```
+or
+```python3
+docker run -d --network host --name ddg -p 8000:8000 duckduckgo_search
+
+```
