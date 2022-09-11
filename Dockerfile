@@ -1,8 +1,4 @@
-FROM python:3-alpine
-
-RUN apk update \
-	&& apk add --no-cache build-base \
-	&& pip install --no-cache-dir --upgrade setuptools pip
+FROM python:3-slim
 
 WORKDIR /code
 
