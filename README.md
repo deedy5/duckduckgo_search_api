@@ -20,11 +20,6 @@ ___
 docker image build -t duckduckgo_search .
 ```
 
-*docker-slim (reduce docker image size) - not necessary*
-```python3
-docker-slim build --expose 8000 duckduckgo_search
-```
-
 **run**
 ```python3
 docker run -d --name ddg -p 8000:8000 duckduckgo_search
