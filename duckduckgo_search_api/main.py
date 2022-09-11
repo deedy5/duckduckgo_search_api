@@ -6,7 +6,7 @@ from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 
-__version__ = "0.1"
+__version__ = "0.1.1"
 
 
 app = FastAPI(
@@ -213,7 +213,7 @@ def ddg_search(
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
     time: Optional[str] = Query(default="None", description="d, w, m, y"),
-    max_results: Optional[int] = Query(default=28, description="number or results,, max=200")
+    max_results: Optional[int] = Query(default=28, description="number or results, max=200")
 ):
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
 
@@ -251,6 +251,7 @@ def ddg_images_search(
         license_image,
         max_results,
     )
+
 
 @app.get("/ddg_videos", response_model=List[DdgVideosOut])
 def ddg_videos_search(
@@ -291,4 +292,4 @@ def ddg_news_search(
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
