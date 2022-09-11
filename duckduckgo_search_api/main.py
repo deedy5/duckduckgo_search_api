@@ -207,7 +207,7 @@ class DdgNewsOut(BaseModel):
         }
 
 
-@app.get("/ddg", response_model=List[DdgOut])
+@app.get("/ddg", response_model=Optional[List[DdgOut]])
 def ddg_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
@@ -220,7 +220,7 @@ def ddg_search(
     return ddg(q, region, safesearch, time, max_results)
 
 
-@app.get("/ddg_images", response_model=List[DdgImagesOut])
+@app.get("/ddg_images", response_model=Optional[List[DdgImagesOut]])
 def ddg_images_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
@@ -253,7 +253,7 @@ def ddg_images_search(
     )
 
 
-@app.get("/ddg_videos", response_model=List[DdgVideosOut])
+@app.get("/ddg_videos", response_model=Optional[List[DdgVideosOut]])
 def ddg_videos_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
@@ -278,7 +278,7 @@ def ddg_videos_search(
     )
 
 
-@app.get("/ddg_news", response_model=List[DdgNewsOut])
+@app.get("/ddg_news", response_model=Optional[List[DdgNewsOut]])
 def ddg_news_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
