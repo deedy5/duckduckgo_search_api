@@ -23,7 +23,7 @@ class DdgIn(BaseModel):
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "Moderate"
     time: Optional[str] = None
-    max_results: Optional[int] = 28
+    max_results: Optional[int] = 25
 
     class Config:
         schema_extra = {
@@ -32,7 +32,7 @@ class DdgIn(BaseModel):
                 "region": "wt-wt",
                 "safesearch": "Moderate",
                 "time": "y",
-                "max_results": 100,
+                "max_results": 25,
             },
         }
 
@@ -112,7 +112,7 @@ class DdgVideosIn(BaseModel):
     resolution: Optional[str] = None
     duration: Optional[str] = None
     license_videos: Optional[str] = None
-    max_results: Optional[int] = 62
+    max_results: Optional[int] = 50
 
     class Config:
         schema_extra = {
@@ -124,7 +124,7 @@ class DdgVideosIn(BaseModel):
                 "resolution": "high",
                 "duration": "medium",
                 "license_videos": "youtube",
-                "max_results": 62,
+                "max_results": 50,
             },
         }
 
@@ -172,7 +172,7 @@ class DdgNewsIn(BaseModel):
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "Moderate"
     time: Optional[str] = None
-    max_results: Optional[int] = 30
+    max_results: Optional[int] = 25
 
     class Config:
         schema_extra = {
@@ -181,7 +181,7 @@ class DdgNewsIn(BaseModel):
                 "region": "wt-wt",
                 "safesearch": "Moderate",
                 "time": "y",
-                "max_results": 30,
+                "max_results": 25,
             },
         }
 
@@ -213,7 +213,7 @@ def ddg_search(
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
     time: Optional[str] = Query(default="None", description="d, w, m, y"),
-    max_results: Optional[int] = Query(default=28, description="number or results, max=200")
+    max_results: Optional[int] = Query(default=25, description="number or results, max=200")
 ):
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
 
@@ -262,7 +262,7 @@ def ddg_videos_search(
     resolution: Optional[str] = Query(default=None, description="high, standart"),
     duration: Optional[str] = Query(default=None, description="short, medium, long"),
     license_videos: Optional[str] = Query(default=None, description="creativeCommon, youtube"),
-    max_results: Optional[int] = Query(default=62, description="number of results, max=1000")
+    max_results: Optional[int] = Query(default=50, description="number of results, max=1000")
 ):
     """DuckDuckGo videos search."""
 
@@ -284,7 +284,7 @@ def ddg_news_search(
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
     time: Optional[str] = Query(default="None", description="d, w, m"),
-    max_results: Optional[int] = Query(default=30, description="number or results, max=240"),
+    max_results: Optional[int] = Query(default=25, description="number or results, max=240"),
 ):
     """DuckDuckGo news search"""
 
