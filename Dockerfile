@@ -1,9 +1,22 @@
-FROM python:3-slim
+# first stage
+FROM python:3-slim AS builder
+
+COPY requirements.txt .
+
+# install dependencies to the local user directory (eg. /root/.local)
+RUN pip install --no-cache-dir --upgrade --user -r requirements.txt
+
+# second unnamed stage
+FROM python:3-alpine
+
+# copy only the dependencies installation from the 1st stage image
+COPY --from=builder /root/.local /root/.local
+
+# update PATH environment variable
+ENV PATH=/root/.local/bin:$PATH
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
 COPY ./duckduckgo_search_api /code/duckduckgo_search_api
-CMD ["uvicorn", "duckduckgo_search_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
+
+CMD ["uvicorn", "duckduckgo_search_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "warning"]
