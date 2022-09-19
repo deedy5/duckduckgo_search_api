@@ -17,7 +17,7 @@ ___
 # Docker
 **build**
 ```python3
-docker image build -t duckduckgo_search .
+docker build -t duckduckgo_search .
 ```
 
 **run**
