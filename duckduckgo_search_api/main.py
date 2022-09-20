@@ -3,10 +3,10 @@ from typing import Dict, List, Optional
 import uvicorn
 from duckduckgo_search import ddg, ddg_images, ddg_news, ddg_videos
 from fastapi import FastAPI, Query
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
-
-__version__ = "0.2"
+__version__ = "0.2.1"
 
 
 app = FastAPI(
@@ -16,6 +16,7 @@ app = FastAPI(
     redoc_url="/",
     docs_url=None,
 )
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 class DdgIn(BaseModel):
