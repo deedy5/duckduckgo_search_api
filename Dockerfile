@@ -1,5 +1,7 @@
 # first stage
-FROM python:3-slim AS builder
+FROM python:3-alpine AS builder
+
+RUN apk add --no-cache gcc g++ musl-dev rust cargo patchelf
 
 COPY requirements.txt .
 
