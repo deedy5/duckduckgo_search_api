@@ -8,7 +8,7 @@ COPY requirements.txt .
 # install dependencies to the local user directory (eg. /root/.local)
 RUN pip install --no-cache-dir --upgrade --user -r requirements.txt
 
-# second unnamed stage
+# second stage
 FROM python:3-alpine
 
 # copy only the dependencies installation from the 1st stage image
