@@ -5,11 +5,13 @@ FROM python:3-alpine AS builder
 # RUN apk add --no-cache gcc g++ musl-dev rust cargo patchelf
 # pip install -U orjson
 
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 COPY requirements.txt .
 
 # install dependencies to the local user directory (eg. /root/.local)
-RUN pip install --no-cache-dir --upgrade --user -r requirements.txt
-
+RUN pip install --upgrade --no-cache-dir --user --no-binary pydantic -r requirements.txt
 
 
 # final stage
