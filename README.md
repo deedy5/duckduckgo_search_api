@@ -1,8 +1,14 @@
-# v0.3
-___
-# Usage
+#  duckduckgo_search_api
+Example:
+
+a) main page - https://ddg.deedy5.repl.co
+
+b) news query - https://ddg.deedy5.repl.co/ddg_news?q=tesla&time=d&max_results=100
+## 1) Usage
 **run**
 ```python3
+git clone https://github.com/deedy5/duckduckgo_search_api.git
+cd duckduckgo_search_api
 python start.py
 ```
 ___
@@ -16,9 +22,11 @@ ___
 python -m pytest
 ```
 ___
-# Docker
+## 2) Docker
 **build**
 ```python3
+git clone https://github.com/deedy5/duckduckgo_search_api.git
+cd duckduckgo_search_api
 docker build -t duckduckgo_search .
 ```
 
