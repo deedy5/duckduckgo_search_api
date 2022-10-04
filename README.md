@@ -12,6 +12,7 @@ ___
 ```python3
 git clone https://github.com/deedy5/duckduckgo_search_api.git
 cd duckduckgo_search_api
+python -m pip install -U -r requirements.txt
 python start.py
 ```
 
