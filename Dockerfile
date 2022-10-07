@@ -1,5 +1,5 @@
 # first stage
-FROM python:3-alpine AS builder
+FROM python:3.11.0rc2-alpine AS builder
 
 # install orjson
 # RUN apk add --no-cache gcc g++ musl-dev rust cargo patchelf
@@ -10,12 +10,15 @@ ENV PYTHONUNBUFFERED 1
 
 COPY requirements.txt .
 
-# install dependencies to the local user directory (eg. /root/.local)
-RUN pip install --upgrade --no-cache-dir --user --no-binary pydantic -r requirements.txt
+RUN apk add --no-cache --virtual .build-deps alpine-sdk musl-dev \
+ && pip install --upgrade --no-cache-dir pip setuptools \
+ && pip install --upgrade --no-cache-dir cython \
+ && pip install --upgrade --no-cache-dir --user -r requirements.txt \
+ && apk --purge del .build-deps
 
 
 # final stage
-FROM python:3-alpine
+FROM python:3.11.0rc2-alpine
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
