@@ -1,5 +1,5 @@
 # first stage
-FROM python:3.11.0rc2-alpine AS builder
+FROM python:3-alpine AS builder
 
 # install orjson
 # RUN apk add --no-cache gcc g++ musl-dev rust cargo patchelf
@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual .build-deps alpine-sdk musl-dev \
 
 
 # final stage
-FROM python:3.11.0rc2-alpine
+FROM python:3-alpine
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
