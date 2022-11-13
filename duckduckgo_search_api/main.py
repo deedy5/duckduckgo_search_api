@@ -7,7 +7,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import UJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.3"
+__version__ = "0.4"
 
 
 app = FastAPI(
@@ -24,18 +24,20 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 class DdgIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "Moderate"
+    safesearch: Optional[str] = "moderate"
     time: Optional[str] = None
-    max_results: Optional[int] = 25
+    page: int = 1
+    max_results: Optional[int] = None
 
     class Config:
         schema_extra = {
             "example": {
                 "q": "Google",
                 "region": "wt-wt",
-                "safesearch": "Moderate",
+                "safesearch": "moderate",
                 "time": "y",
-                "max_results": 25,
+                "page": 1,
+                "max_results": None,
             },
         }
 
@@ -58,28 +60,30 @@ class DdgOut(BaseModel):
 class DdgImagesIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "Moderate"
+    safesearch: Optional[str] = "moderate"
     time: Optional[str] = None
     size: Optional[str] = None
     color: Optional[str] = None
     type_image: Optional[str] = None
     layout: Optional[str] = None
     license_image: Optional[str] = None
-    max_results: Optional[int] = 100
+    page: int = 1
+    max_results: Optional[int] = None
 
     class Config:
         schema_extra = {
             "example": {
                 "q": "apple",
                 "region": "wt-wt",
-                "safesearch": "Moderate",
+                "safesearch": "moderate",
                 "time": "Year",
                 "size": "Wallpaper",
                 "color": "color",
                 "type_image": "photo",
                 "layout": "Wide",
                 "license_image": "any",
-                "max_results": 100,
+                "page": 1,
+                "max_results": None,
             },
         }
 
@@ -110,24 +114,26 @@ class DdgImagesOut(BaseModel):
 class DdgVideosIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "Moderate"
+    safesearch: Optional[str] = "moderate"
     time: Optional[str] = None
     resolution: Optional[str] = None
     duration: Optional[str] = None
     license_videos: Optional[str] = None
-    max_results: Optional[int] = 50
+    page: int = 1
+    max_results: Optional[int] = None
 
     class Config:
         schema_extra = {
             "example": {
                 "q": "USSR",
                 "region": "wt-wt",
-                "safesearch": "Moderate",
+                "safesearch": "moderate",
                 "time": "y",
                 "resolution": "high",
                 "duration": "medium",
                 "license_videos": "youtube",
-                "max_results": 50,
+                "page": 1,
+                "max_results": None,
             },
         }
 
@@ -173,18 +179,20 @@ class DdgVideosOut(BaseModel):
 class DdgNewsIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "Moderate"
+    safesearch: Optional[str] = "moderate"
     time: Optional[str] = None
-    max_results: Optional[int] = 25
+    page: int = 1
+    max_results: Optional[int] = None
 
     class Config:
         schema_extra = {
             "example": {
                 "q": "Ford",
                 "region": "wt-wt",
-                "safesearch": "Moderate",
+                "safesearch": "moderate",
                 "time": "y",
-                "max_results": 25,
+                "page": 1,
+                "max_results": None,
             },
         }
 
@@ -214,9 +222,10 @@ class DdgNewsOut(BaseModel):
 def ddg_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
+    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
     time: Optional[str] = Query(default="None", description="d, w, m, y"),
-    max_results: Optional[int] = Query(default=25, description="number or results, max=200")
+    page: int = Query(default=1, description="pagination"),
+    max_results: Optional[int] = Query(default=None, description="number or results, max=200")
 ):
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
 
@@ -227,7 +236,7 @@ def ddg_search(
 def ddg_images_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
+    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
     time: Optional[str] = Query(default=None, description="Day, Week, Month, Year"),
     size: Optional[str] = Query(default=None, description="Small, Medium, Large, Wallpaper"),
     color: Optional[str] = Query(default=None, description="""color, Monochrome, Red, Orange, Yellow, Green, Blue,
@@ -238,7 +247,8 @@ def ddg_images_search(
             Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
             Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
             Use Commercially)"""),
-    max_results: Optional[int] = Query(default=100, description="number of results, max=1000"),
+    page: int = Query(default=1, description="pagination"),
+    max_results: Optional[int] = Query(default=None, description="number of results, max=1000"),
 ):
     """DuckDuckGo images search."""
 
@@ -260,12 +270,13 @@ def ddg_images_search(
 def ddg_videos_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
+    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
     time: Optional[str] = Query(default=None, description="d, w, m"),
     resolution: Optional[str] = Query(default=None, description="high, standart"),
     duration: Optional[str] = Query(default=None, description="short, medium, long"),
     license_videos: Optional[str] = Query(default=None, description="creativeCommon, youtube"),
-    max_results: Optional[int] = Query(default=50, description="number of results, max=1000")
+    page: int = Query(default=1, description="pagination"),
+    max_results: Optional[int] = Query(default=None, description="number of results, max=1000")
 ):
     """DuckDuckGo videos search."""
 
@@ -285,9 +296,10 @@ def ddg_videos_search(
 def ddg_news_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="Moderate", description="On, Moderate, Off"),
+    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
     time: Optional[str] = Query(default="None", description="d, w, m"),
-    max_results: Optional[int] = Query(default=25, description="number or results, max=240"),
+    page: int = Query(default=1, description="pagination"),
+    max_results: Optional[int] = Query(default=None, description="number or results, max=240"),
 ):
     """DuckDuckGo news search"""
 
