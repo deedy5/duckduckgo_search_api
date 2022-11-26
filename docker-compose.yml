@@ -1,7 +1,7 @@
 services:
   ddg:
     build: .
-    command: uvicorn duckduckgo_search_api.main:app --host 0.0.0.0 --port 9000
+    command: uvicorn duckduckgo_search_api.main:app --host 0.0.0.0 --port 8000
     #ports:
     #  - "8000:8000"
     network_mode: "host"
