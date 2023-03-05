@@ -7,7 +7,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import UJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.4"
+__version__ = "0.4.1"
 
 
 app = FastAPI(

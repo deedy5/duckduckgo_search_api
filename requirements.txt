@@ -1,9 +1,4 @@
-duckduckgo_search>="2.7.0"
-fastapi>="0.86"
-ujson>="5.5.0"
-uvicorn>="0.19.0"
-httptools>="0.5.0"
-uvloop>="0.17.0"
---no-binary=pydantic
---no-binary=httptools
---no-binary=uvloop
+duckduckgo_search==2.8.1
+fastapi==0.92.0
+ujson==5.7.0
+uvicorn==0.20.0

@@ -1,24 +1,19 @@
 # first stage
-FROM python:3-alpine AS builder
+FROM python:3.11-slim AS builder
 
-# install orjson
-# RUN apk add --no-cache gcc g++ musl-dev rust cargo patchelf
-# pip install -U orjson
-
+ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 COPY requirements.txt .
 
-RUN apk add --no-cache --virtual .build-deps alpine-sdk musl-dev \
- && pip install --upgrade --no-cache-dir pip setuptools \
- && pip install --upgrade --no-cache-dir cython \
- && pip install --upgrade --no-cache-dir --user -r requirements.txt \
- && apk --purge del .build-deps
+RUN apt-get update && apt-get install -y --no-install-recommends --no-install-suggests \
+ 	&& pip install --no-cache-dir --user -r requirements.txt \
+	&& rm -rf /var/lib/apt/lists/*
 
 
 # final stage
-FROM python:3-alpine
+FROM python:3.11-slim
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
