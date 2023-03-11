@@ -4,10 +4,10 @@ import uvicorn
 from duckduckgo_search import ddg, ddg_images, ddg_news, ddg_videos
 from fastapi import FastAPI, Query
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 
 app = FastAPI(
@@ -16,7 +16,7 @@ app = FastAPI(
     version=__version__,
     redoc_url="/",
     docs_url=None,
-    default_response_class=UJSONResponse,
+    default_response_class=ORJSONResponse,
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
