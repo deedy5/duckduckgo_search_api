@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 
+import orjson
 import uvicorn
 from duckduckgo_search import ddg, ddg_images, ddg_news, ddg_videos
 from fastapi import FastAPI, Query
