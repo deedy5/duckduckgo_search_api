@@ -1,14 +1,14 @@
+import logging
 from typing import Dict, List, Optional
 
-import orjson
 import uvicorn
-from duckduckgo_search import ddg, ddg_images, ddg_news, ddg_videos
+from duckduckgo_search import DDGS
 from fastapi import FastAPI, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 
 
 app = FastAPI(
@@ -26,8 +26,7 @@ class DdgIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "moderate"
-    time: Optional[str] = None
-    page: int = 1
+    timelimit: Optional[str] = None
     max_results: Optional[int] = None
 
     class Config:
@@ -36,8 +35,7 @@ class DdgIn(BaseModel):
                 "q": "Google",
                 "region": "wt-wt",
                 "safesearch": "moderate",
-                "time": "y",
-                "page": 1,
+                "timelimit": "y",
                 "max_results": None,
             },
         }
@@ -62,13 +60,12 @@ class DdgImagesIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "moderate"
-    time: Optional[str] = None
+    timelimit: Optional[str] = None
     size: Optional[str] = None
     color: Optional[str] = None
     type_image: Optional[str] = None
     layout: Optional[str] = None
     license_image: Optional[str] = None
-    page: int = 1
     max_results: Optional[int] = None
 
     class Config:
@@ -77,13 +74,12 @@ class DdgImagesIn(BaseModel):
                 "q": "apple",
                 "region": "wt-wt",
                 "safesearch": "moderate",
-                "time": "Year",
+                "timelimit": "Year",
                 "size": "Wallpaper",
                 "color": "color",
                 "type_image": "photo",
                 "layout": "Wide",
                 "license_image": "any",
-                "page": 1,
                 "max_results": None,
             },
         }
@@ -116,11 +112,10 @@ class DdgVideosIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "moderate"
-    time: Optional[str] = None
+    timelimit: Optional[str] = None
     resolution: Optional[str] = None
     duration: Optional[str] = None
     license_videos: Optional[str] = None
-    page: int = 1
     max_results: Optional[int] = None
 
     class Config:
@@ -129,11 +124,10 @@ class DdgVideosIn(BaseModel):
                 "q": "USSR",
                 "region": "wt-wt",
                 "safesearch": "moderate",
-                "time": "y",
+                "timelimit": "y",
                 "resolution": "high",
                 "duration": "medium",
                 "license_videos": "youtube",
-                "page": 1,
                 "max_results": None,
             },
         }
@@ -181,8 +175,7 @@ class DdgNewsIn(BaseModel):
     q: str
     region: Optional[str] = "wt-wt"
     safesearch: Optional[str] = "moderate"
-    time: Optional[str] = None
-    page: int = 1
+    timelimit: Optional[str] = None
     max_results: Optional[int] = None
 
     class Config:
@@ -191,8 +184,7 @@ class DdgNewsIn(BaseModel):
                 "q": "Ford",
                 "region": "wt-wt",
                 "safesearch": "moderate",
-                "time": "y",
-                "page": 1,
+                "timelimit": "y",
                 "max_results": None,
             },
         }
@@ -219,26 +211,37 @@ class DdgNewsOut(BaseModel):
         }
 
 
-@app.get("/ddg", response_model=Optional[List[DdgOut]])
+@app.get("/text")#, response_model=Optional[List[DdgOut]])
 def ddg_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    time: Optional[str] = Query(default="None", description="d, w, m, y"),
-    page: int = Query(default=1, description="pagination"),
+    timelimit: Optional[str] = Query(default=None, description="d, w, m, y"),
     max_results: Optional[int] = Query(default=None, description="number or results, max=200")
 ):
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
+    results = []
+    try:
+        for r in DDGS().text(
+            q, 
+            region,
+            safesearch,
+            timelimit,
+        ):
+            results.append(r)
+            if max_results and len(results) >= max_results:
+                break
+    except Exception as ex:
+        logging.warning(ex)
+    return results
 
-    return ddg(q, region, safesearch, time, max_results)
 
-
-@app.get("/ddg_images", response_model=Optional[List[DdgImagesOut]])
+@app.get("/images", response_model=Optional[List[DdgImagesOut]])
 def ddg_images_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    time: Optional[str] = Query(default=None, description="Day, Week, Month, Year"),
+    timelimit: Optional[str] = Query(default=None, description="Day, Week, Month, Year"),
     size: Optional[str] = Query(default=None, description="Small, Medium, Large, Wallpaper"),
     color: Optional[str] = Query(default=None, description="""color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White."""),
@@ -248,63 +251,87 @@ def ddg_images_search(
             Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
             Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
             Use Commercially)"""),
-    page: int = Query(default=1, description="pagination"),
     max_results: Optional[int] = Query(default=None, description="number of results, max=1000"),
 ):
     """DuckDuckGo images search."""
 
-    return ddg_images(
-        q,
-        region,
-        safesearch,
-        time,
-        size,
-        color,
-        type_image,
-        layout,
-        license_image,
-        max_results,
-    )
+    results = []
+    try:
+        for r in DDGS().images(
+            q,
+            region,
+            safesearch,
+            timelimit,
+            size,
+            color,
+            type_image,
+            layout,
+            license_image,
+        ):
+            results.append(r)
+            if max_results and len(results) >= max_results:
+                break
+    except Exception as ex:
+        logging.warning(ex)
+    return results
 
 
-@app.get("/ddg_videos", response_model=Optional[List[DdgVideosOut]])
+@app.get("/videos", response_model=Optional[List[DdgVideosOut]])
 def ddg_videos_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    time: Optional[str] = Query(default=None, description="d, w, m"),
+    timelimit: Optional[str] = Query(default=None, description="d, w, m"),
     resolution: Optional[str] = Query(default=None, description="high, standart"),
     duration: Optional[str] = Query(default=None, description="short, medium, long"),
     license_videos: Optional[str] = Query(default=None, description="creativeCommon, youtube"),
-    page: int = Query(default=1, description="pagination"),
     max_results: Optional[int] = Query(default=None, description="number of results, max=1000")
 ):
     """DuckDuckGo videos search."""
 
-    return ddg_videos(
-        q,
-        region,
-        safesearch,
-        time,
-        resolution,
-        duration,
-        license_videos,
-        max_results,
-    )
+    results = []
+    try:
+        for r in DDGS().videos(
+            q,
+            region,
+            safesearch,
+            timelimit,
+            resolution,
+            duration,
+            license_videos,
+        ):
+            results.append(r)
+            if max_results and len(results) >= max_results:
+                break
+    except Exception as ex:
+        logging.warning(ex)
+    return results
 
 
-@app.get("/ddg_news", response_model=Optional[List[DdgNewsOut]])
+@app.get("/news", response_model=Optional[List[DdgNewsOut]])
 def ddg_news_search(
     q: str = Query(description="Query string"),
     region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
     safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    time: Optional[str] = Query(default="None", description="d, w, m"),
-    page: int = Query(default=1, description="pagination"),
+    timelimit: Optional[str] = Query(default="None", description="d, w, m"),
     max_results: Optional[int] = Query(default=None, description="number or results, max=240"),
 ):
     """DuckDuckGo news search"""
 
-    return ddg_news(q, region, safesearch, time, max_results)
+    results = []
+    try:
+        for r in DDGS().news(
+            q,
+            region,
+            safesearch,
+            timelimit,
+        ):
+            results.append(r)
+            if max_results and len(results) >= max_results:
+                break
+    except Exception as ex:
+        logging.warning(ex)
+    return results
 
 
 if __name__ == "__main__":
