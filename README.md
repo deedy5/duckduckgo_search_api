@@ -1,14 +1,6 @@
 #  duckduckgo_search_api
 
 Fastapi code to deploy an API that pulls data from duckduckgo search engine.
-
-**Example:**
-
-a) main page - https://ddg.deedy5.repl.co </br>
-b) text search - https://ddg.deedy5.repl.co/ddg?q=doom </br>
-c) images search - https://ddg.deedy5.repl.co/ddg_images?q=rose </br>
-d) videos search - https://ddg.deedy5.repl.co/ddg_videos?q=cat%20vs%20dog </br>
-e) news search - https://ddg.deedy5.repl.co/ddg_news?q=tesla&time=d
 ___
 ## 1) Usage
 **clone**
