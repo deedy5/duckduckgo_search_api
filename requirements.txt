@@ -1,4 +1,4 @@
-duckduckgo_search==3.2.0
+duckduckgo_search==3.7.0
 fastapi==0.95.2
-orjson==3.8.12
+orjson==3.8.14
 uvicorn==0.22.0
