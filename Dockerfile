@@ -1,5 +1,5 @@
 # first stage
-FROM python:3.11.3-slim AS builder
+FROM python:3.11.5-slim AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends --no-install-su
 
 
 # final stage
-FROM python:3.11.3-slim
+FROM python:3.11.5-slim
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
