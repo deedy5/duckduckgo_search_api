@@ -8,6 +8,13 @@ ___
 git clone https://github.com/deedy5/duckduckgo_search_api.git
 cd duckduckgo_search_api
 ```
+**add PROXY and set TIMEOUT in main.py** (*example with [iproyal residential proxies](https://iproyal.com?r=residential_proxies)*)
+```python3
+...
+TIMEOUT = 20
+PROXY = "socks5://user:password@geo.iproyal.com:32325"
+...
+```
 **run**
 ```python3
 python -m pip install -U -r requirements.txt
@@ -20,29 +27,12 @@ python start.py
 
 ___
 ## 2) Docker-compose
-**clone**
-```python3
-git clone https://github.com/deedy5/duckduckgo_search_api.git
-cd duckduckgo_search_api
-```
-
 **run**
 ```python3
-docker-compose up
+docker-compose up --build
 ```
-
-**check**</br>
-[http://127.0.0.1:8000/](http://127.0.0.1:8000/)</br>
-[http://127.0.0.1:8000/ddg?q=test](http://127.0.0.1:8000/ddg?q=test)
-
 ___
 ## 3) Docker
-**clone**
-```python3
-git clone https://github.com/deedy5/duckduckgo_search_api.git
-cd duckduckgo_search_api
-```
-
 **build**
 ```python3
 docker build -t duckduckgo_search .
@@ -56,10 +46,6 @@ or
 ```python3
 docker run -d --network host --name ddg -p 8000:8000 duckduckgo_search
 ```
-
-**check**</br>
-[http://127.0.0.1:8000/](http://127.0.0.1:8000/)</br>
-[http://127.0.0.1:8000/ddg?q=test](http://127.0.0.1:8000/ddg?q=test)
 
 ___
 ## 4) Test

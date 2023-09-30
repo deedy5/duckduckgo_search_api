@@ -1,15 +1,18 @@
 import logging
-from typing import Dict, List, Optional
+from typing import Annotated
 
 import uvicorn
-from duckduckgo_search import DDGS
+from duckduckgo_search import AsyncDDGS
 from fastapi import FastAPI, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
+
+TIMEOUT = 10
+PROXY = None
 
 app = FastAPI(
     title="duckduckgo_search_api",
@@ -22,67 +25,22 @@ app = FastAPI(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
-class DdgIn(BaseModel):
-    q: str
-    region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "moderate"
-    timelimit: Optional[str] = None
-    max_results: Optional[int] = None
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "q": "Google",
-                "region": "wt-wt",
-                "safesearch": "moderate",
-                "timelimit": "y",
-                "max_results": None,
-            },
-        }
-
-
-class DdgOut(BaseModel):
+class DdgTextOut(BaseModel):
     title: str
     href: str
     body: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "title": "Google",
-                "href": "https://www.google.com",
-                "body": "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find exactly what you're looking for.",
-            },
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "title": "Google",
+                    "href": "https://www.google.com",
+                    "body": "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find exactly what you're looking for.",
+                }
+            ],
         }
-
-
-class DdgImagesIn(BaseModel):
-    q: str
-    region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "moderate"
-    timelimit: Optional[str] = None
-    size: Optional[str] = None
-    color: Optional[str] = None
-    type_image: Optional[str] = None
-    layout: Optional[str] = None
-    license_image: Optional[str] = None
-    max_results: Optional[int] = None
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "q": "apple",
-                "region": "wt-wt",
-                "safesearch": "moderate",
-                "timelimit": "Year",
-                "size": "Wallpaper",
-                "color": "color",
-                "type_image": "photo",
-                "layout": "Wide",
-                "license_image": "any",
-                "max_results": None,
-            },
-        }
+    }
 
 
 class DdgImagesOut(BaseModel):
@@ -90,47 +48,25 @@ class DdgImagesOut(BaseModel):
     image: str
     thumbnail: str
     url: str
-    height: str
-    width: str
+    height: int
+    width: int
     source: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "title": "Enjoying The Apple Harvest :: 100+ Apple Recipes! • The Prairie Homestead",
-                "image": "https://www.theprairiehomestead.com/wp-content/uploads/2014/10/150.jpg",
-                "thumbnail": "https://tse1.mm.bing.net/th?id=OIP.C0I3WQo6IJ2XehGprhMujQHaLI&pid=Api",
-                "url": "https://www.theprairiehomestead.com/2014/10/100-apple-recipes.html/attachment/150",
-                "height": "3008",
-                "width": "2000",
-                "source": "Bing",
-            },
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "title": "Enjoying The Apple Harvest :: 100+ Apple Recipes! • The Prairie Homestead",
+                    "image": "https://www.theprairiehomestead.com/wp-content/uploads/2014/10/150.jpg",
+                    "thumbnail": "https://tse1.mm.bing.net/th?id=OIP.C0I3WQo6IJ2XehGprhMujQHaLI&pid=Api",
+                    "url": "https://www.theprairiehomestead.com/2014/10/100-apple-recipes.html/attachment/150",
+                    "height": 3008,
+                    "width": 2000,
+                    "source": "Bing",
+                }
+            ],
         }
-
-
-class DdgVideosIn(BaseModel):
-    q: str
-    region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "moderate"
-    timelimit: Optional[str] = None
-    resolution: Optional[str] = None
-    duration: Optional[str] = None
-    license_videos: Optional[str] = None
-    max_results: Optional[int] = None
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "q": "USSR",
-                "region": "wt-wt",
-                "safesearch": "moderate",
-                "timelimit": "y",
-                "resolution": "high",
-                "duration": "medium",
-                "license_videos": "youtube",
-                "max_results": None,
-            },
-        }
+    }
 
 
 class DdgVideosOut(BaseModel):
@@ -139,16 +75,16 @@ class DdgVideosOut(BaseModel):
     duration: str
     embed_html: str
     embed_url: str
-    images: Dict
+    images: dict
     provider: str
     published: str
     publisher: str
-    statistics: Dict
+    statistics: dict
     title: str
     uploader: str
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "content": "https://www.youtube.com/watch?v=kp9vGSTqWvI",
                 "description": "The Fall Of The Soviet Union https://www.youtube.com/watch?v=zadkWw702_M&t=5s » Subscribe to NowThis World: http://go.nowth.is/World_Subscribe Until its fall in 1991, the Soviet Union was a major player on the world stage. So just how did the USSR come to be? Learn More: The New York Times: Nov. 7, 1917 | Russian Government Overthrown in ...",
@@ -169,25 +105,7 @@ class DdgVideosOut(BaseModel):
                 "uploader": "NowThis World",
             },
         }
-
-
-class DdgNewsIn(BaseModel):
-    q: str
-    region: Optional[str] = "wt-wt"
-    safesearch: Optional[str] = "moderate"
-    timelimit: Optional[str] = None
-    max_results: Optional[int] = None
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "q": "Ford",
-                "region": "wt-wt",
-                "safesearch": "moderate",
-                "timelimit": "y",
-                "max_results": None,
-            },
-        }
+    }
 
 
 class DdgNewsOut(BaseModel):
@@ -195,140 +113,183 @@ class DdgNewsOut(BaseModel):
     title: str
     body: str
     url: str
-    image: Optional[str]
+    image: str | None = None
     source: str
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "date": "2022-06-16T18:14:00",
                 "title": "Ford recalls 394,000 vehicles in Canada over rollaway concerns",
-                "body": "Ford is ecalling more than 3.3 million vehicles in North America, including 394,000 in Canada, that could roll away because a damaged or missing part may prevent the vehicle from shifting into the intended gear.",
+                "body": "Ford is recalling more than 3.3 million vehicles in North America, including 394,000 in Canada, that could roll away because a damaged or missing part may prevent the vehicle from shifting into the intended gear.",
                 "url": "https://canada.autonews.com/recalls/ford-recalls-394000-vehicles-canada-over-rollaway-concerns",
                 "image": "https://s3-prod-canada.autonews.com/s3fs-public/styles/1200x630/public/Ford%20badge%20web.jpg",
                 "source": "Automotive News",
             },
         }
+    }
 
 
-@app.get("/text")#, response_model=Optional[List[DdgOut]])
-def ddg_search(
-    q: str = Query(description="Query string"),
-    region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    timelimit: Optional[str] = Query(default=None, description="d, w, m, y"),
-    max_results: Optional[int] = Query(default=None, description="number or results, max=200")
-):
+@app.get("/text")
+async def ddg_search(
+    q: Annotated[str, Query(description="Query string")],
+    region: Annotated[
+        str, Query(description="wt-wt, us-en, uk-en, ru-ru, etc.")
+    ] = "wt-wt",
+    safesearch: Annotated[str, Query(description="on, moderate, off")] = "moderate",
+    timelimit: Annotated[str | None, Query(description="d, w, m, y")] = None,
+    backend: Annotated[str, Query(description="api, html, lite")] = "api",
+    max_results: Annotated[
+        int | None, Query(description="number or results, max=200")
+    ] = None,
+) -> list[DdgTextOut]:
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
     results = []
     try:
-        for r in DDGS().text(
-            q, 
-            region,
-            safesearch,
-            timelimit,
-        ):
-            results.append(r)
-            if max_results and len(results) >= max_results:
-                break
+        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
+            async for r in ddgs.text(
+                q,
+                region,
+                safesearch,
+                timelimit,
+                backend,
+                max_results,
+            ):
+                results.append(r)
     except Exception as ex:
         logging.warning(ex)
     return results
 
 
-@app.get("/images", response_model=Optional[List[DdgImagesOut]])
-def ddg_images_search(
-    q: str = Query(description="Query string"),
-    region: Optional[str] = Query(default="wt-wt", description="wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    timelimit: Optional[str] = Query(default=None, description="Day, Week, Month, Year"),
-    size: Optional[str] = Query(default=None, description="Small, Medium, Large, Wallpaper"),
-    color: Optional[str] = Query(default=None, description="""color, Monochrome, Red, Orange, Yellow, Green, Blue,
-            Purple, Pink, Brown, Black, Gray, Teal, White."""),
-    type_image: Optional[str] = Query(default=None, description="photo, clipart, gif, transparent, line"),
-    layout: Optional[str] = Query(default=None, description="Square, Tall, Wide"),
-    license_image: Optional[str] = Query(default=None, description="""any (All Creative Commons), Public (PublicDomain),
+@app.get("/images")
+async def ddg_images_search(
+    q: Annotated[str, Query(description="Query string")],
+    region: Annotated[
+        str | None, Query(description="wt-wt, us-en, uk-en, ru-ru, etc.")
+    ] = "wt-wt",
+    safesearch: Annotated[
+        str | None, Query(description="on, moderate, off")
+    ] = "moderate",
+    timelimit: Annotated[
+        str | None, Query(description="Day, Week, Month, Year")
+    ] = None,
+    size: Annotated[
+        str | None, Query(description="Small, Medium, Large, Wallpaper")
+    ] = None,
+    color: Annotated[
+        str | None,
+        Query(
+            description="""color, Monochrome, Red, Orange, Yellow, Green, Blue,
+            Purple, Pink, Brown, Black, Gray, Teal, White.""",
+        ),
+    ] = None,
+    type_image: Annotated[
+        str | None, Query(description="photo, clipart, gif, transparent, line")
+    ] = None,
+    layout: Annotated[str | None, Query(description="Square, Tall, Wide")] = None,
+    license_image: Annotated[
+        str | None,
+        Query(
+            description="""any (All Creative Commons), Public (PublicDomain),
             Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
             Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
-            Use Commercially)"""),
-    max_results: Optional[int] = Query(default=None, description="number of results, max=1000"),
-):
+            Use Commercially)""",
+        ),
+    ] = None,
+    max_results: Annotated[
+        int | None, Query(description="number of results, max=1000")
+    ] = None,
+) -> list[DdgImagesOut]:
     """DuckDuckGo images search."""
 
     results = []
     try:
-        for r in DDGS().images(
-            q,
-            region,
-            safesearch,
-            timelimit,
-            size,
-            color,
-            type_image,
-            layout,
-            license_image,
-        ):
-            results.append(r)
-            if max_results and len(results) >= max_results:
-                break
+        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
+            async for r in ddgs.images(
+                q,
+                region,
+                safesearch,
+                timelimit,
+                size,
+                color,
+                type_image,
+                layout,
+                license_image,
+                max_results,
+            ):
+                results.append(r)
     except Exception as ex:
         logging.warning(ex)
     return results
 
 
-@app.get("/videos", response_model=Optional[List[DdgVideosOut]])
-def ddg_videos_search(
-    q: str = Query(description="Query string"),
-    region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    timelimit: Optional[str] = Query(default=None, description="d, w, m"),
-    resolution: Optional[str] = Query(default=None, description="high, standart"),
-    duration: Optional[str] = Query(default=None, description="short, medium, long"),
-    license_videos: Optional[str] = Query(default=None, description="creativeCommon, youtube"),
-    max_results: Optional[int] = Query(default=None, description="number of results, max=1000")
-):
+@app.get("/videos")
+async def ddg_videos_search(
+    q: Annotated[str, Query(description="Query string")],
+    region: Annotated[
+        str | None, Query(description="country - wt-wt, us-en, uk-en, ru-ru, etc.")
+    ] = "wt-wt",
+    safesearch: Annotated[
+        str | None, Query(description="on, moderate, off")
+    ] = "moderate",
+    timelimit: Annotated[str | None, Query(description="d, w, m")] = None,
+    resolution: Annotated[str | None, Query(description="high, standard")] = None,
+    duration: Annotated[str | None, Query(description="short, medium, long")] = None,
+    license_videos: Annotated[
+        str | None, Query(description="creativeCommon, youtube")
+    ] = None,
+    max_results: Annotated[
+        int | None, Query(description="number of results, max=1000")
+    ] = None,
+) -> list[DdgVideosOut]:
     """DuckDuckGo videos search."""
 
     results = []
     try:
-        for r in DDGS().videos(
-            q,
-            region,
-            safesearch,
-            timelimit,
-            resolution,
-            duration,
-            license_videos,
-        ):
-            results.append(r)
-            if max_results and len(results) >= max_results:
-                break
+        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
+            async for r in ddgs.videos(
+                q,
+                region,
+                safesearch,
+                timelimit,
+                resolution,
+                duration,
+                license_videos,
+                max_results,
+            ):
+                results.append(r)
     except Exception as ex:
         logging.warning(ex)
     return results
 
 
-@app.get("/news", response_model=Optional[List[DdgNewsOut]])
-def ddg_news_search(
-    q: str = Query(description="Query string"),
-    region: Optional[str] = Query(default="wt-wt", description="country - wt-wt, us-en, uk-en, ru-ru, etc."),
-    safesearch: Optional[str] = Query(default="moderate", description="on, moderate, off"),
-    timelimit: Optional[str] = Query(default="None", description="d, w, m"),
-    max_results: Optional[int] = Query(default=None, description="number or results, max=240"),
-):
+@app.get("/news")
+async def ddg_news_search(
+    q: Annotated[str, Query(description="Query string")],
+    region: Annotated[
+        str | None, Query(description="country - wt-wt, us-en, uk-en, ru-ru, etc.")
+    ] = "wt-wt",
+    safesearch: Annotated[
+        str | None, Query(description="on, moderate, off")
+    ] = "moderate",
+    timelimit: Annotated[str | None, Query(description="d, w, m")] = None,
+    max_results: Annotated[
+        int | None, Query(description="number of results, max=240")
+    ] = None,
+) -> list[DdgNewsOut]:
     """DuckDuckGo news search"""
 
     results = []
     try:
-        for r in DDGS().news(
-            q,
-            region,
-            safesearch,
-            timelimit,
-        ):
-            results.append(r)
-            if max_results and len(results) >= max_results:
-                break
+        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
+            async for r in ddgs.news(
+                q,
+                region,
+                safesearch,
+                timelimit,
+                max_results,
+            ):
+                results.append(r)
     except Exception as ex:
         logging.warning(ex)
     return results
