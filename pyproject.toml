@@ -1,0 +1,65 @@
+[project]
+name = "duckduckgo_search_api"
+description = "Deploy an API that pulls data from duckduckgo search engine. "
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT License"}
+keywords = ["python", "duckduckgo"]
+authors = [
+  {name = "deedy5"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "duckduckgo_search==5.1.0",  
+    "litestar[standard]==2.7.0",
+    "orjson==3.9.15"
+]
+dynamic = ["version"]
+
+[project.urls]  # Optional
+"Homepage" = "https://github.com/deedy5/duckduckgo_search_api"
+
+[tool.setuptools.dynamic]
+version = {attr = "duckduckgo_search_api.main.__version__"}
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.9.0",
+    "pytest>=8.1.1",
+    "ruff>=0.3.3",
+]
+
+[tool.ruff]
+line-length = 120
+exclude = ["tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "UP",  # pyupgrade
+    "B",  # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "I",  # isort
+]
+ignore = ["D100"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+strict = true
+exclude = ["tests/", "build/"]
