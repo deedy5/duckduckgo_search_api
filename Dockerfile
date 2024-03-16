@@ -1,28 +1,21 @@
-# first stage
-FROM python:3.11.5-slim AS builder
+FROM python:3.12.2-slim-bookworm
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Create appuser and switch to it
+RUN useradd --create-home appuser
+USER appuser
 
+# Include the directory where python packages are installed in the PATH
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
+# Set the working directory to a folder inside appuser's home directory
+WORKDIR /home/appuser/app
+
+# Install dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-RUN apt-get update && apt-get install -y --no-install-recommends --no-install-suggests \
- 	&& pip install --no-cache-dir --user -r requirements.txt \
-	&& rm -rf /var/lib/apt/lists/*
+# Copy the application code
+COPY ./duckduckgo_search_api /home/appuser/app/duckduckgo_search_api
 
-
-# final stage
-FROM python:3.11.5-slim
-
-# copy only the dependencies installation from the 1st stage image
-COPY --from=builder /root/.local /root/.local
-
-# update PATH environment variable
-ENV PATH=/root/.local/bin:$PATH
-
-WORKDIR /code
-
-COPY ./duckduckgo_search_api /code/duckduckgo_search_api
-
+# Run the application
 CMD ["uvicorn", "duckduckgo_search_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "warning"]

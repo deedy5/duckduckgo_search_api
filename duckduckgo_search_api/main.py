@@ -8,7 +8,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 
 TIMEOUT = 10
@@ -144,21 +144,19 @@ async def ddg_search(
     ] = None,
 ) -> list[DdgTextOut]:
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
-    results = []
     try:
         async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            async for r in ddgs.text(
+            results = await ddgs.text(
                 q,
                 region,
                 safesearch,
                 timelimit,
                 backend,
                 max_results,
-            ):
-                results.append(r)
+            )
+            return results
     except Exception as ex:
         logging.warning(ex)
-    return results
 
 
 @app.get("/images")
@@ -202,10 +200,9 @@ async def ddg_images_search(
 ) -> list[DdgImagesOut]:
     """DuckDuckGo images search."""
 
-    results = []
     try:
         async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            async for r in ddgs.images(
+            results = await ddgs.images(
                 q,
                 region,
                 safesearch,
@@ -216,11 +213,10 @@ async def ddg_images_search(
                 layout,
                 license_image,
                 max_results,
-            ):
-                results.append(r)
+            )
+            return results
     except Exception as ex:
         logging.warning(ex)
-    return results
 
 
 @app.get("/videos")
@@ -244,10 +240,9 @@ async def ddg_videos_search(
 ) -> list[DdgVideosOut]:
     """DuckDuckGo videos search."""
 
-    results = []
     try:
         async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            async for r in ddgs.videos(
+            results = await ddgs.videos(
                 q,
                 region,
                 safesearch,
@@ -256,11 +251,10 @@ async def ddg_videos_search(
                 duration,
                 license_videos,
                 max_results,
-            ):
-                results.append(r)
+            )
+            return results
     except Exception as ex:
         logging.warning(ex)
-    return results
 
 
 @app.get("/news")
@@ -279,20 +273,18 @@ async def ddg_news_search(
 ) -> list[DdgNewsOut]:
     """DuckDuckGo news search"""
 
-    results = []
     try:
         async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            async for r in ddgs.news(
+            results = await ddgs.news(
                 q,
                 region,
                 safesearch,
                 timelimit,
                 max_results,
-            ):
-                results.append(r)
+            )
+            return results
     except Exception as ex:
         logging.warning(ex)
-    return results
 
 
 if __name__ == "__main__":
