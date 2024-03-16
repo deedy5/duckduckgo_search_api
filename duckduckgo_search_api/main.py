@@ -5,6 +5,7 @@ from typing import Annotated, cast
 import uvicorn
 from duckduckgo_search import AsyncDDGS
 from litestar import Litestar, get
+from litestar.config.app import ExperimentalFeatures
 from litestar.config.compression import CompressionConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 from litestar.params import Parameter
@@ -286,6 +287,7 @@ app = Litestar(
     openapi_config=OpenAPIConfig(
         title="duckduckgo_search_api", version=__version__, openapi_controller=MyOpenAPIController
     ),
+    experimental_features=[ExperimentalFeatures.DTO_CODEGEN],
 )
 
 
