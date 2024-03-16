@@ -281,7 +281,7 @@ app = Litestar(
     ],
     compression_config=CompressionConfig(
         backend="gzip",
-        gzip_compress_level=9,
+        gzip_compress_level=1,
     ),
     openapi_config=OpenAPIConfig(
         title="duckduckgo_search_api", version=__version__, openapi_controller=MyOpenAPIController
