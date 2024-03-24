@@ -1,6 +1,6 @@
 #  duckduckgo_search_api
 
-Fastapi code to deploy an API that pulls data from duckduckgo search engine.
+Deploy an API that pulls data from duckduckgo search engine.
 ___
 ## 1) Usage
 **clone**
@@ -33,20 +33,12 @@ docker-compose up --build
 ```
 ___
 ## 3) Docker
-**build**
 ```python3
-docker build -t duckduckgo_search .
+# build
+docker build -t ddgs .
+# run
+docker run -d --name ddgs -p 8000:8000 --dns 1.1.1.1 --dns 8.8.8.8 ddgs
 ```
-
-**run**
-```python3
-docker run -d --name ddg -p 8000:8000 duckduckgo_search
-```
-or
-```python3
-docker run -d --network host --name ddg -p 8000:8000 duckduckgo_search
-```
-
 ___
 ## 4) Test
 ```python3
