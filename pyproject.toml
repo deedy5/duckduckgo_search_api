@@ -24,7 +24,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "duckduckgo_search==5.2.0",  
+    "duckduckgo_search==5.2.1",  
     "litestar[standard]==2.7.0"
 ]
 dynamic = ["version"]
