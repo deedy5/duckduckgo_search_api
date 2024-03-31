@@ -62,11 +62,11 @@ class DdgNewsOut:
     image: str
 
 
-class MyOpenAPIController(OpenAPIController):  ## type: ignore
+class MyOpenAPIController(OpenAPIController):  # type: ignore
     path = "/"
 
 
-@get("/text")  ## type: ignore
+@get("/text")  # type: ignore
 async def ddg_text_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -93,22 +93,22 @@ async def ddg_text_search(
 ) -> list[DdgTextOut]:
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
     try:
-        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            results = await ddgs.text(
-                q,
-                region=region,
-                safesearch=safesearch,
-                timelimit=timelimit,
-                backend=backend,
-                max_results=max_results,
-            )
-            return cast(list[DdgTextOut], results)
+        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = await addgs.text(
+            q,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            backend=backend,
+            max_results=max_results,
+        )
+        return cast(list[DdgTextOut], results)
     except Exception as ex:
         logging.warning(ex)
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/images")  ## type: ignore
+@get("/images")  # type: ignore
 async def ddg_images_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -166,26 +166,26 @@ async def ddg_images_search(
 ) -> list[DdgImagesOut]:
     """DuckDuckGo images search."""
     try:
-        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            results = await ddgs.images(
-                q,
-                region=region,
-                safesearch=safesearch,
-                timelimit=timelimit,
-                size=size,
-                color=color,
-                type_image=type_image,
-                layout=layout,
-                license_image=license_image,
-                max_results=max_results,
-            )
-            return cast(list[DdgImagesOut], results)
+        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = await addgs.images(
+            q,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            size=size,
+            color=color,
+            type_image=type_image,
+            layout=layout,
+            license_image=license_image,
+            max_results=max_results,
+        )
+        return cast(list[DdgImagesOut], results)
     except Exception as ex:
         logging.warning(ex)
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/videos")  ## type: ignore
+@get("/videos")  # type: ignore
 async def ddg_videos_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -220,24 +220,24 @@ async def ddg_videos_search(
 ) -> list[DdgVideosOut]:
     """DuckDuckGo videos search."""
     try:
-        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            results = await ddgs.videos(
-                q,
-                region,
-                safesearch,
-                timelimit,
-                resolution,
-                duration,
-                license_videos,
-                max_results,
-            )
-            return cast(list[DdgVideosOut], results)
+        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = await addgs.videos(
+            q,
+            region,
+            safesearch,
+            timelimit,
+            resolution,
+            duration,
+            license_videos,
+            max_results,
+        )
+        return cast(list[DdgVideosOut], results)
     except Exception as ex:
         logging.warning(ex)
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/news")  ## type: ignore
+@get("/news")  # type: ignore
 async def ddg_news_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -260,15 +260,15 @@ async def ddg_news_search(
 ) -> list[DdgNewsOut]:
     """DuckDuckGo news search"""
     try:
-        async with AsyncDDGS(proxies=PROXY, timeout=TIMEOUT) as ddgs:
-            results = await ddgs.news(
-                q,
-                region,
-                safesearch,
-                timelimit,
-                max_results,
-            )
-            return cast(list[DdgNewsOut], results)
+        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = await addgs.news(
+            q,
+            region,
+            safesearch,
+            timelimit,
+            max_results,
+        )
+        return cast(list[DdgNewsOut], results)
     except Exception as ex:
         logging.warning(ex)
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
