@@ -62,11 +62,11 @@ class DdgNewsOut:
     image: str
 
 
-class MyOpenAPIController(OpenAPIController):  # type: ignore
+class MyOpenAPIController(OpenAPIController):
     path = "/"
 
 
-@get("/text")  # type: ignore
+@get("/text")
 async def ddg_text_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -108,7 +108,7 @@ async def ddg_text_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/images")  # type: ignore
+@get("/images")
 async def ddg_images_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -185,7 +185,7 @@ async def ddg_images_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/videos")  # type: ignore
+@get("/videos")
 async def ddg_videos_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
@@ -237,7 +237,7 @@ async def ddg_videos_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/news")  # type: ignore
+@get("/news")
 async def ddg_news_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
