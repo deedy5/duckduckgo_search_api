@@ -1,2 +1,2 @@
-duckduckgo_search==5.3.0
-litestar[standard]==2.8.2
+duckduckgo_search==5.3.1b1
+litestar[standard]==2.8.3
