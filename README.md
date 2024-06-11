@@ -2,6 +2,10 @@
 
 Deploy an API that pulls data from duckduckgo search engine.
 
+**Disclaimer**
+
+This library is not affiliated with DuckDuckGo and is for educational purposes only. It is not intended for commercial use or any purpose that violates DuckDuckGo's Terms of Service. By using this library, you acknowledge that you will not use it in a way that infringes on DuckDuckGo's terms. The official DuckDuckGo website can be found at https://duckduckgo.com.
+
 ## Usage
 ### 1) Simple (pull from hub.docker.com)
 ```python3
