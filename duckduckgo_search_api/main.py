@@ -5,13 +5,12 @@ from typing import Annotated, cast
 import uvicorn
 from duckduckgo_search import AsyncDDGS
 from litestar import Litestar, Response, get
-from litestar.config.app import ExperimentalFeatures
 from litestar.config.compression import CompressionConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 from litestar.params import Parameter
 from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 
 TIMEOUT = 10
@@ -94,7 +93,7 @@ async def ddg_text_search(
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
     try:
         addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.text(
+        results = await addgs.atext(
             q,
             region=region,
             safesearch=safesearch,
@@ -167,7 +166,7 @@ async def ddg_images_search(
     """DuckDuckGo images search."""
     try:
         addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.images(
+        results = await addgs.aimages(
             q,
             region=region,
             safesearch=safesearch,
@@ -221,7 +220,7 @@ async def ddg_videos_search(
     """DuckDuckGo videos search."""
     try:
         addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.videos(
+        results = await addgs.avideos(
             q,
             region,
             safesearch,
@@ -261,7 +260,7 @@ async def ddg_news_search(
     """DuckDuckGo news search"""
     try:
         addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.news(
+        results = await addgs.anews(
             q,
             region,
             safesearch,
@@ -288,7 +287,6 @@ app = Litestar(
     openapi_config=OpenAPIConfig(
         title="duckduckgo_search_api", version=__version__, openapi_controller=MyOpenAPIController
     ),
-    experimental_features=[ExperimentalFeatures.DTO_CODEGEN],
 )
 
 
