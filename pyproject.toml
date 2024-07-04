@@ -24,8 +24,8 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "duckduckgo_search==5.3.1b1",  
-    "litestar[standard]==2.8.3"
+    "duckduckgo_search==6.1.8",  
+    "litestar[standard]==2.9.1"
 ]
 dynamic = ["version"]
 
@@ -37,9 +37,9 @@ version = {attr = "duckduckgo_search_api.main.__version__"}
 
 [project.optional-dependencies]
 dev = [
-    "mypy>=1.9.0",
-    "pytest>=8.1.1",
-    "ruff>=0.3.4",
+    "mypy>=1.10.1",
+    "pytest>=8.2.2",
+    "ruff>=0.5.0",
 ]
 
 [tool.ruff]
