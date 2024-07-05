@@ -1,2 +1,2 @@
-duckduckgo_search==6.1.8
+duckduckgo_search==6.1.9
 litestar[standard]==2.9.1
