@@ -10,7 +10,7 @@ from litestar.openapi import OpenAPIConfig, OpenAPIController
 from litestar.params import Parameter
 from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 
 TIMEOUT = 10
