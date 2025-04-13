@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Annotated, cast
 
 import uvicorn
-from duckduckgo_search import AsyncDDGS
+from duckduckgo_search import DDGS
 from litestar import Litestar, Response, get
 from litestar.config.compression import CompressionConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
@@ -65,8 +65,8 @@ class MyOpenAPIController(OpenAPIController):
     path = "/"
 
 
-@get("/text")
-async def ddg_text_search(
+@get("/text", sync_to_thread=True)
+def ddg_text_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
     safesearch: Annotated[
@@ -83,17 +83,17 @@ async def ddg_text_search(
     ] = None,
     backend: Annotated[
         str,
-        Parameter(description="Backend", default="api", pattern="^(api|html|lite)$"),
-    ] = "api",
+        Parameter(description="Backend", default="auto", pattern="^(auto|html|lite)$"),
+    ] = "auto",
     max_results: Annotated[
         int | None,
-        Parameter(title="max_results", description="Max results. Max 500", default=None),
+        Parameter(title="max_results", description="Max results. Max 100", default=None),
     ] = None,
 ) -> list[DdgTextOut]:
     """DuckDuckGo text search. Query params: https://duckduckgo.com/params"""
     try:
-        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.atext(
+        ddgs = DDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = ddgs.text(
             q,
             region=region,
             safesearch=safesearch,
@@ -107,8 +107,8 @@ async def ddg_text_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/images")
-async def ddg_images_search(
+@get("/images", sync_to_thread=True)
+def ddg_images_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
     safesearch: Annotated[
@@ -165,8 +165,8 @@ async def ddg_images_search(
 ) -> list[DdgImagesOut]:
     """DuckDuckGo images search."""
     try:
-        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.aimages(
+        ddgs = DDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = ddgs.images(
             q,
             region=region,
             safesearch=safesearch,
@@ -184,8 +184,8 @@ async def ddg_images_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/videos")
-async def ddg_videos_search(
+@get("/videos", sync_to_thread=True)
+def ddg_videos_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
     safesearch: Annotated[
@@ -219,8 +219,8 @@ async def ddg_videos_search(
 ) -> list[DdgVideosOut]:
     """DuckDuckGo videos search."""
     try:
-        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.avideos(
+        ddgs = DDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = ddgs.videos(
             q,
             region,
             safesearch,
@@ -236,8 +236,8 @@ async def ddg_videos_search(
         return Response(status_code=HTTP_500_INTERNAL_SERVER_ERROR)  # type: ignore
 
 
-@get("/news")
-async def ddg_news_search(
+@get("/news", sync_to_thread=True)
+def ddg_news_search(
     q: Annotated[str, Parameter(description="Search query", required=True)],
     region: Annotated[str, Parameter(description="Region", default="wt-wt")] = "wt-wt",
     safesearch: Annotated[
@@ -259,8 +259,8 @@ async def ddg_news_search(
 ) -> list[DdgNewsOut]:
     """DuckDuckGo news search"""
     try:
-        addgs = AsyncDDGS(proxies=PROXY, timeout=TIMEOUT)
-        results = await addgs.anews(
+        ddgs = DDGS(proxies=PROXY, timeout=TIMEOUT)
+        results = ddgs.news(
             q,
             region,
             safesearch,
